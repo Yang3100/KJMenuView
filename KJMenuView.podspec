@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "KJMenuView"
-  s.version      = "1.0.1"
+  s.version      = "1.0.2"
   s.summary      = "Organize some menu controls."
   s.homepage     = "https://github.com/yangKJ/KJMenuView"
   s.license      = "MIT"

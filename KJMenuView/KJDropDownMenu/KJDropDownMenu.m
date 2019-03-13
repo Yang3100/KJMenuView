@@ -9,6 +9,7 @@
 #import "KJDropDownMenu.h"
 
 #define kDropDownMenuScreenW    ([UIScreen mainScreen].bounds.size.width)
+#define kDropDownMenuScreenH    ([UIScreen mainScreen].bounds.size.height)
 
 @interface KJDropDownMenu ()<UITableViewDataSource, UITableViewDelegate>
 @property (nonatomic, assign) CGPoint origin;
@@ -355,7 +356,7 @@
                 rightTableView.frame = CGRectMake(self.origin.x+leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*(1-ratio), tableViewHeight);
             }
         }];
-        self.bgButton.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW, kScreenH-self.frame.origin.y - self.frame.size.height);
+        self.bgButton.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW, kDropDownMenuScreenH-self.frame.origin.y - self.frame.size.height);
     } else {
         [UIView animateWithDuration:0.2 animations:^{
             if (leftTableView) {
