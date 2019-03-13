@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "KJMenuView"
-  s.version      = "1.0.0"
+  s.version      = "1.0.1"
   s.summary      = "Organize some menu controls."
   s.homepage     = "https://github.com/yangKJ/KJMenuView"
   s.license      = "MIT"
@@ -18,7 +18,6 @@ Pod::Spec.new do |s|
   s.subspec 'MenuCollectionView' do |ss|
     ss.source_files = "KJMenuView/MenuCollectionView/**/*.{h,m}" # 添加文件
     ss.public_header_files = "KJMenuView/MenuCollectionView/**/*.h",'KJMenuView/MenuCollectionView/*.h'# 添加头文件
-    ss.resources    = "KJMenuView/MenuCollectionView/**/*.{bundle}" # 添加数据资料
   end
 
   s.subspec 'KJDropDownMenu' do |ss|
@@ -27,7 +26,7 @@ Pod::Spec.new do |s|
     ss.resources    = "KJMenuView/KJDropDownMenu/**/*.{bundle}" # 添加数据资料
   end
   
-  s.frameworks = 'Foundation','UIKit','QuartzCore','Accelerate'#,'AssetsLibrary','MobileCoreServices','CoreFoundation','CoreGraphics','CoreImage','ImageIO','CoreText','SystemConfiguration'
+  s.frameworks = 'Foundation','UIKit'#,'QuartzCore','Accelerate'#,'AssetsLibrary','MobileCoreServices','CoreFoundation','CoreGraphics','CoreImage','ImageIO','CoreText','SystemConfiguration'
   # s.dependency "JSONKit", "~> 1.4"
   
 end

@@ -8,6 +8,8 @@
 
 #import "KJDropDownMenu.h"
 
+#define kDropDownMenuScreenW    ([UIScreen mainScreen].bounds.size.width)
+
 @interface KJDropDownMenu ()<UITableViewDataSource, UITableViewDelegate>
 @property (nonatomic, assign) CGPoint origin;
 @property (nonatomic, strong) UITableView *leftTableView;
@@ -204,11 +206,11 @@
         
         CGFloat ratio = [_dataSource menu:self widthRatioOfLeftColumn:_currentSelectedMenudIndex];
         if (_leftTableView) {
-            _leftTableView.frame = CGRectMake(_leftTableView.frame.origin.x, self.frame.origin.y + self.frame.size.height, kScreenW*ratio, 0);
+            _leftTableView.frame = CGRectMake(_leftTableView.frame.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*ratio, 0);
         }
         
         if (_rightTableView) {
-            _rightTableView.frame = CGRectMake(self.origin.x+_leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kScreenW*(1-ratio), 0);
+            _rightTableView.frame = CGRectMake(self.origin.x+_leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*(1-ratio), 0);
         }
         [self animateIdicator:_indicators[tapIndex]  leftTableView:_leftTableView rightTableView:_rightTableView title:_titles[tapIndex] forward:YES complecte:^{
             weakself.show = YES;
@@ -327,19 +329,19 @@
     CGFloat ratio = [_dataSource menu:self widthRatioOfLeftColumn:_currentSelectedMenudIndex];
     
     if (show) {
-        self.bgButton.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kScreenW, 0);
+        self.bgButton.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW, 0);
         [self.superview addSubview:self.bgButton];
         
         CGFloat leftTableViewHeight = 0;
         CGFloat rightTableViewHeight = 0;
         if (leftTableView) {
-            leftTableView.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kScreenW*ratio, 0);
+            leftTableView.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*ratio, 0);
             [self.superview addSubview:leftTableView];
             leftTableViewHeight = self.MaxTableH;
         }
         if ([self.dataSource menu:self haveRightTableViewInColumn:_currentSelectedMenudIndex]){
             if (rightTableView) {
-                rightTableView.frame = CGRectMake(self.origin.x+leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kScreenW*(1-ratio), 0);
+                rightTableView.frame = CGRectMake(self.origin.x+leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*(1-ratio), 0);
                 [self.superview addSubview:rightTableView];
                 rightTableViewHeight = self.MaxTableH;
             }
@@ -347,20 +349,20 @@
         CGFloat tableViewHeight = MAX(leftTableViewHeight, rightTableViewHeight);
         [UIView animateWithDuration:0.2 animations:^{
             if (leftTableView) {
-                leftTableView.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kScreenW*ratio, tableViewHeight);
+                leftTableView.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*ratio, tableViewHeight);
             }
             if (rightTableView) {
-                rightTableView.frame = CGRectMake(self.origin.x+leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kScreenW*(1-ratio), tableViewHeight);
+                rightTableView.frame = CGRectMake(self.origin.x+leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*(1-ratio), tableViewHeight);
             }
         }];
-        self.bgButton.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kScreenW, kScreenH-self.frame.origin.y - self.frame.size.height);
+        self.bgButton.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW, kScreenH-self.frame.origin.y - self.frame.size.height);
     } else {
         [UIView animateWithDuration:0.2 animations:^{
             if (leftTableView) {
-                leftTableView.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kScreenW*ratio, 0);
+                leftTableView.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*ratio, 0);
             }
             if (rightTableView) {
-                rightTableView.frame = CGRectMake(self.origin.x+leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kScreenW*(1-ratio), 0);
+                rightTableView.frame = CGRectMake(self.origin.x+leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*(1-ratio), 0);
             }
         } completion:^(BOOL finished) {
             if (leftTableView) {
@@ -370,7 +372,7 @@
                 [rightTableView removeFromSuperview];
             }
         }];
-        self.bgButton.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kScreenW, 0);
+        self.bgButton.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW, 0);
         [self.bgButton removeFromSuperview];
     }
     complete();
@@ -378,7 +380,7 @@
 
 - (void)animateTitle:(CATextLayer *)title show:(BOOL)show complete:(void(^)(void))complete {
     CGSize size = [self calculateTitleSizeWithString:title.string];
-    CGFloat sizeWidth = (size.width < (kScreenW / _numOfMenu) - 25) ? size.width : kScreenW / _numOfMenu - 25;
+    CGFloat sizeWidth = (size.width < (kDropDownMenuScreenW / _numOfMenu) - 25) ? size.width : kDropDownMenuScreenW / _numOfMenu - 25;
     title.bounds = CGRectMake(0, 0, sizeWidth, size.height);
     complete();
 }
