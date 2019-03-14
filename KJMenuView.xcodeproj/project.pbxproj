@@ -27,6 +27,8 @@
 		68DAA6252237B7B8009150EA /* KJDropDownMenuModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 68DAA61D2237B7B8009150EA /* KJDropDownMenuModel.m */; };
 		68DAA6262237B7B8009150EA /* NSString+KJMenuSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 68DAA61E2237B7B8009150EA /* NSString+KJMenuSize.m */; };
 		68DAA62A2237B858009150EA /* KJDropDownMenuVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 68DAA6292237B858009150EA /* KJDropDownMenuVC.m */; };
+		68F09068223A01DE00EA06C1 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 68F09067223A01DE00EA06C1 /* README.md */; };
+		68F0906A223A022400EA06C1 /* KJMenuView.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 68F09069223A022400EA06C1 /* KJMenuView.podspec */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,6 +71,8 @@
 		68DAA6202237B7B8009150EA /* NSString+KJMenuSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+KJMenuSize.h"; sourceTree = "<group>"; };
 		68DAA6282237B858009150EA /* KJDropDownMenuVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KJDropDownMenuVC.h; sourceTree = "<group>"; };
 		68DAA6292237B858009150EA /* KJDropDownMenuVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KJDropDownMenuVC.m; sourceTree = "<group>"; };
+		68F09067223A01DE00EA06C1 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		68F09069223A022400EA06C1 /* KJMenuView.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = KJMenuView.podspec; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,6 +160,8 @@
 				68776CF321AC34A0000A1435 /* LaunchScreen.storyboard */,
 				68776CF621AC34A0000A1435 /* Info.plist */,
 				68776CF721AC34A0000A1435 /* main.m */,
+				68F09067223A01DE00EA06C1 /* README.md */,
+				68F09069223A022400EA06C1 /* KJMenuView.podspec */,
 			);
 			path = KJMenuView;
 			sourceTree = "<group>";
@@ -273,7 +279,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				68776CF521AC34A0000A1435 /* LaunchScreen.storyboard in Resources */,
+				68F0906A223A022400EA06C1 /* KJMenuView.podspec in Resources */,
 				68776CF221AC34A0000A1435 /* Assets.xcassets in Resources */,
+				68F09068223A01DE00EA06C1 /* README.md in Resources */,
 				68776CF021AC34A0000A1435 /* Main.storyboard in Resources */,
 				6804FBF62238F31C0071699E /* KJDropDownMenu.bundle in Resources */,
 			);

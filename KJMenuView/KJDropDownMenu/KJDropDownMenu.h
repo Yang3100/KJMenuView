@@ -11,10 +11,9 @@
 
 /// 文字对齐方式
 typedef NS_ENUM(NSInteger,KJMenuTextAlignmentType) {
-    KJMenuTextAlignmentTypeLeft = 0,  // 左对齐
+    KJMenuTextAlignmentTypeLeft   = 0,  // 左对齐
     KJMenuTextAlignmentTypeCenter = 1,  // 居中
 };
-
 
 @class KJDropDownMenu;
 @protocol KJDropDownMenuDelegate <NSObject>
@@ -85,6 +84,11 @@ typedef NS_ENUM(NSInteger,KJMenuTextAlignmentType) {
 @property (nonatomic, assign) CGFloat TableCellH;
 /** 当前菜单是否正在显示 */
 @property (nonatomic,assign,readonly) BOOL kCurrentMenuDisplay;
+/** 是否显示选中勾勾，默认显示 */
+@property (nonatomic,assign) BOOL kIsDisplayDraw;
+/** 是否显示左边竖线，默认不显示 */
+@property (nonatomic,assign) BOOL kIsDisplayVerticalLine;
+
 /** 隐藏 */
 - (void)kDismiss;
 

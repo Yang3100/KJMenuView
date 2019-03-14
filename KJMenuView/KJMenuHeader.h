@@ -1,6 +1,6 @@
 //
-//  KJHeader.h
-//  KJEmitterDemo
+//  KJMenuHeader.h
+//  KJMenuView
 //
 //  Created by 杨科军 on 2018/11/26.
 //  Copyright © 2018 杨科军. All rights reserved.
@@ -11,8 +11,8 @@
  博客地址：https://blog.csdn.net/qq_34534179
  */
 
-#ifndef KJHeader_h
-#define KJHeader_h
+#ifndef KJMenuHeader_h
+#define KJMenuHeader_h
 
 // 输出日志 (格式: [时间] [哪个方法] [哪行] [输出内容])
 #ifdef DEBUG
@@ -25,4 +25,4 @@
 #import "KJMenuCollectionView.h"  // 菜单
 #import "KJDropDownMenu.h"  // 下拉菜单
 
-#endif /* KJHeader_h */
+#endif /* KJMenuHeader_h */

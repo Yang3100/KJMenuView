@@ -7,7 +7,6 @@
 //
 
 #import "KJDropDownMenuVC.h"
-#import "KJDropDownMenu.h"
 @interface KJDropDownMenuVC ()<KJDropDownMenuDataSource,KJDropDownMenuDelegate>{
     NSInteger addressIndex;
     NSInteger addressSubIndex;
@@ -60,6 +59,8 @@
         menu.leftTableBgColor = UIColor.whiteColor;
         menu.rightTableBgColor = UIColorFromHEXA(0xF5F5F5, 1);
         menu.leftSelectTextColor = UIColor.redColor;
+        menu.kIsDisplayVerticalLine = YES;
+        menu.kIsDisplayDraw = NO;
         menu.dataSource = self;
         menu.delegate = self;
     }
@@ -127,11 +128,23 @@
 - (KJMenuTextAlignmentType)menu:(KJDropDownMenu *)menu RowTextAlignmentForColumn:(NSInteger)column{
     if (menu == self.AddressMenu2) {
         switch (column) {
-            case 0: return KJMenuTextAlignmentTypeCenter;
+            case 0: {
+                menu.kIsDisplayDraw = YES;
+                menu.kIsDisplayVerticalLine = NO;
+                return KJMenuTextAlignmentTypeCenter;
+            }
                 break;
-            case 1: return KJMenuTextAlignmentTypeLeft;
+            case 1: {
+                menu.kIsDisplayDraw = NO;
+                menu.kIsDisplayVerticalLine = YES;
+                return KJMenuTextAlignmentTypeLeft;
+            }
                 break;
-            case 2: return KJMenuTextAlignmentTypeCenter;
+            case 2: {
+                menu.kIsDisplayDraw = YES;
+                menu.kIsDisplayVerticalLine = NO;
+                return KJMenuTextAlignmentTypeCenter;
+            }
                 break;
         }
     }

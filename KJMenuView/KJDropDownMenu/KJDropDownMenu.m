@@ -18,13 +18,13 @@
 @property (nonatomic, strong) UIButton *bgButton;
 
 @property (nonatomic, assign) BOOL show;
-@property (nonatomic, assign) NSInteger numOfMenu;
-@property (nonatomic, assign) NSInteger currentSelectedMenudIndex;
-@property (nonatomic, copy) NSArray *array;
+@property (nonatomic, assign) NSInteger menuNums;
+@property (nonatomic, assign) NSInteger currentSelectMenuIndex;
+@property (nonatomic, assign) NSInteger leftSelectedRow;
+
 //layers array
 @property (nonatomic, copy) NSArray *titles;
 @property (nonatomic, copy) NSArray *indicators;
-@property (nonatomic, assign) NSInteger leftSelectedRow;
 
 @end
 
@@ -46,25 +46,49 @@
     self.leftTextFont = [UIFont systemFontOfSize:14];
     self.rightTextFont = [UIFont systemFontOfSize:14];
     self.topTextFont = [UIFont systemFontOfSize:14];
+    self.kIsDisplayDraw = YES;
+    self.kIsDisplayVerticalLine = NO;
 }
+#pragma mark - init method
+- (instancetype)initWithFrame:(CGRect)frame{
+    if (self==[super initWithFrame:frame]) {
+        [self setConfig];
+        self.origin = CGPointMake(0, 0);
+        _currentSelectMenuIndex = 0;
+        _show = NO;
+        
+        //self tapped
+        self.autoresizesSubviews = NO;
+        self.backgroundColor = self.TopBgColor;
+        UIGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(menuTapped:)];
+        [self addGestureRecognizer:tapGesture];
+        
+        UIButton *button = [UIButton buttonWithType:(UIButtonTypeCustom)];
+        self.bgButton = button;
+        button.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
+        [button addTarget:self action:@selector(HideClick) forControlEvents:(UIControlEventTouchUpInside)];
+    }
+    return self;
+}
+
 #pragma mark - setter
 - (void)setDataSource:(id<KJDropDownMenuDataSource>)dataSource {
     _dataSource = dataSource;
     
     //configure view
     if ([_dataSource respondsToSelector:@selector(numberOfColumnsInMenu:)]) {
-        _numOfMenu = [_dataSource numberOfColumnsInMenu:self];
+        _menuNums = [_dataSource numberOfColumnsInMenu:self];
     } else {
-        _numOfMenu = 1;
+        _menuNums = 1;
     }
     
-    CGFloat textLayerInterval = self.frame.size.width / ( _numOfMenu * 2);
-    CGFloat bgLayerInterval = self.frame.size.width / _numOfMenu;
-    CGFloat separatorLineInterval = self.frame.size.width / _numOfMenu;
-    NSMutableArray *tempTitles = [[NSMutableArray alloc] initWithCapacity:_numOfMenu];
-    NSMutableArray *tempIndicators = [[NSMutableArray alloc] initWithCapacity:_numOfMenu];
+    CGFloat textLayerInterval = self.frame.size.width / (_menuNums * 2);
+    CGFloat bgLayerInterval = self.frame.size.width / _menuNums;
+    CGFloat separatorLineInterval = self.frame.size.width / _menuNums;
+    NSMutableArray *tempTitles = [[NSMutableArray alloc] initWithCapacity:_menuNums];
+    NSMutableArray *tempIndicators = [[NSMutableArray alloc] initWithCapacity:_menuNums];
     
-    for (int i = 0; i < _numOfMenu; i++) {
+    for (int i = 0; i < _menuNums; i++) {
         //bgLayer
         CGPoint bgLayerPosition = CGPointMake((i+0.5)*bgLayerInterval, self.frame.size.height/2);
         CALayer *bgLayer = [self createBgLayerWithColor:self.TopBgColor andPosition:bgLayerPosition];
@@ -80,7 +104,7 @@
         [self.layer addSublayer:indicator];
         [tempIndicators addObject:indicator];
         //separator
-        if (i != _numOfMenu - 1) {
+        if (i != _menuNums - 1) {
             CGPoint separatorPosition = CGPointMake((i + 1) * separatorLineInterval, self.frame.size.height/2);
             CAShapeLayer *separator = [self createSeparatorLineWithColor:self.separatorColor andPosition:separatorPosition];
             [self.layer addSublayer:separator];
@@ -109,28 +133,6 @@
     _separatorColor = separatorColor;
     self.leftTableView.separatorColor = separatorColor;
     self.rightTableView.separatorColor = separatorColor;
-}
-
-#pragma mark - init method
-- (instancetype)initWithFrame:(CGRect)frame{
-    if (self==[super initWithFrame:frame]) {
-        [self setConfig];
-        self.origin = CGPointMake(0, 0);
-        _currentSelectedMenudIndex = 0;
-        _show = NO;
-        
-        //self tapped
-        self.autoresizesSubviews = NO;
-        self.backgroundColor = self.TopBgColor;
-        UIGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(menuTapped:)];
-        [self addGestureRecognizer:tapGesture];
-        
-        UIButton *button = [UIButton buttonWithType:(UIButtonTypeCustom)];
-        self.bgButton = button;
-        button.backgroundColor = [UIColor colorWithWhite:0 alpha:0.3];
-        [button addTarget:self action:@selector(HideClick) forControlEvents:(UIControlEventTouchUpInside)];
-    }
-    return self;
 }
 
 #pragma mark - lazy
@@ -163,7 +165,7 @@
     if (self.delegate || [self.delegate respondsToSelector:@selector(menu:isDisplay:)]) {
         [self.delegate menu:self isDisplay:true];
     }
-    [self animateIdicator:_indicators[_currentSelectedMenudIndex] leftTableView:_leftTableView rightTableView:_rightTableView title:_titles[_currentSelectedMenudIndex] forward:NO complecte:^{
+    [self animateIdicator:_indicators[_currentSelectMenuIndex] leftTableView:_leftTableView rightTableView:_rightTableView title:_titles[_currentSelectMenuIndex] forward:NO complecte:^{
         self->_show = NO;
     }];
 }
@@ -176,8 +178,8 @@
     __weak typeof(self) weakself = self;    /// 弱引用
     CGPoint touchPoint = [paramSender locationInView:self];
     //calculate index
-    NSInteger tapIndex = touchPoint.x / (self.frame.size.width / _numOfMenu);
-    for (int i = 0; i < _numOfMenu; i++) {
+    NSInteger tapIndex = touchPoint.x / (self.frame.size.width / _menuNums);
+    for (int i = 0; i < _menuNums; i++) {
         if (i != tapIndex) {
             [self animateIndicator:_indicators[i] Forward:NO complete:^{
                 [weakself animateTitle:weakself.titles[i] show:NO complete:^{}];
@@ -189,15 +191,15 @@
     if (haveRightTableView) {
         rightTableView = _rightTableView;
     }
-    if (tapIndex == _currentSelectedMenudIndex && _show) {
-        [self animateIdicator:_indicators[_currentSelectedMenudIndex]  leftTableView:_leftTableView rightTableView:_rightTableView title:_titles[_currentSelectedMenudIndex] forward:NO complecte:^{
-            weakself.currentSelectedMenudIndex = tapIndex;
+    if (tapIndex == _currentSelectMenuIndex && _show) {
+        [self animateIdicator:_indicators[_currentSelectMenuIndex]  leftTableView:_leftTableView rightTableView:_rightTableView title:_titles[_currentSelectMenuIndex] forward:NO complecte:^{
+            weakself.currentSelectMenuIndex = tapIndex;
             weakself.show = NO;
         }];
     } else {
-        _currentSelectedMenudIndex = tapIndex;
+        _currentSelectMenuIndex = tapIndex;
         if ([_dataSource respondsToSelector:@selector(menu:currentLeftSelectedRow:)]) {
-            _leftSelectedRow = [_dataSource menu:self currentLeftSelectedRow:_currentSelectedMenudIndex];
+            _leftSelectedRow = [_dataSource menu:self currentLeftSelectedRow:_currentSelectMenuIndex];
         }
         
         if (rightTableView) {
@@ -205,7 +207,7 @@
         }
         [_leftTableView reloadData];
         
-        CGFloat ratio = [_dataSource menu:self widthRatioOfLeftColumn:_currentSelectedMenudIndex];
+        CGFloat ratio = [_dataSource menu:self widthRatioOfLeftColumn:_currentSelectMenuIndex];
         if (_leftTableView) {
             _leftTableView.frame = CGRectMake(_leftTableView.frame.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*ratio, 0);
         }
@@ -223,7 +225,7 @@
 - (CALayer *)createBgLayerWithColor:(UIColor *)color andPosition:(CGPoint)position {
     CALayer *layer = [CALayer layer];
     layer.position = position;
-    layer.bounds = CGRectMake(0, 0, self.frame.size.width/self.numOfMenu, self.frame.size.height-1);
+    layer.bounds = CGRectMake(0, 0, self.frame.size.width/self.menuNums, self.frame.size.height-1);
     layer.backgroundColor = color.CGColor;
     return layer;
 }
@@ -248,7 +250,7 @@
 - (CATextLayer *)createTextLayerWithNSString:(NSString *)string withColor:(UIColor *)color andPosition:(CGPoint)point {
     CGSize size = [self calculateTitleSizeWithString:string];
     CATextLayer *layer = [CATextLayer new];
-    CGFloat sizeWidth = (size.width < (self.frame.size.width / _numOfMenu) - 25) ? size.width : self.frame.size.width / _numOfMenu - 25;
+    CGFloat sizeWidth = (size.width < (self.frame.size.width / _menuNums) - 25) ? size.width : self.frame.size.width / _menuNums - 25;
     layer.bounds = CGRectMake(0, 0, sizeWidth, size.height);
     layer.string = string;
     layer.fontSize = _topTextFont.pointSize;
@@ -284,7 +286,7 @@
     for (int i = 0; i<_titles.count; i++) {
         CATextLayer *layer = (CATextLayer *)_titles[i];
         CAShapeLayer *shapeLayer = _indicators[i];
-        if (i == _currentSelectedMenudIndex && forward) {
+        if (i == _currentSelectMenuIndex && forward) {
             [layer setForegroundColor:_TopSelectTitleColor.CGColor];
             [shapeLayer setFillColor:_TopSelectTitleColor.CGColor];
         }else{
@@ -327,7 +329,7 @@
 /** 动画显示下拉菜单table */
 - (void)animateLeftTableView:(UITableView *)leftTableView rightTableView:(UITableView *)rightTableView show:(BOOL)show complete:(void(^)(void))complete{
     /// 获取分割比例
-    CGFloat ratio = [_dataSource menu:self widthRatioOfLeftColumn:_currentSelectedMenudIndex];
+    CGFloat ratio = [_dataSource menu:self widthRatioOfLeftColumn:_currentSelectMenuIndex];
     
     if (show) {
         self.bgButton.frame = CGRectMake(self.origin.x, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW, 0);
@@ -340,7 +342,7 @@
             [self.superview addSubview:leftTableView];
             leftTableViewHeight = self.MaxTableH;
         }
-        if ([self.dataSource menu:self haveRightTableViewInColumn:_currentSelectedMenudIndex]){
+        if ([self.dataSource menu:self haveRightTableViewInColumn:_currentSelectMenuIndex]){
             if (rightTableView) {
                 rightTableView.frame = CGRectMake(self.origin.x+leftTableView.frame.size.width, self.frame.origin.y + self.frame.size.height, kDropDownMenuScreenW*(1-ratio), 0);
                 [self.superview addSubview:rightTableView];
@@ -381,7 +383,7 @@
 
 - (void)animateTitle:(CATextLayer *)title show:(BOOL)show complete:(void(^)(void))complete {
     CGSize size = [self calculateTitleSizeWithString:title.string];
-    CGFloat sizeWidth = (size.width < (kDropDownMenuScreenW / _numOfMenu) - 25) ? size.width : kDropDownMenuScreenW / _numOfMenu - 25;
+    CGFloat sizeWidth = (size.width < (kDropDownMenuScreenW / _menuNums) - 25) ? size.width : kDropDownMenuScreenW / _menuNums - 25;
     title.bounds = CGRectMake(0, 0, sizeWidth, size.height);
     complete();
 }
@@ -408,7 +410,7 @@
     
     NSAssert(self.dataSource != nil, @"menu's dataSource shouldn't be nil");
     if ([self.dataSource respondsToSelector:@selector(menu:numberOfRowsInColumn:leftOrRight:leftRow:)]) {
-        return [self.dataSource menu:self numberOfRowsInColumn:self.currentSelectedMenudIndex leftOrRight:leftOrRight leftRow:_leftSelectedRow];
+        return [self.dataSource menu:self numberOfRowsInColumn:self.currentSelectMenuIndex leftOrRight:leftOrRight leftRow:_leftSelectedRow];
     } else {
         NSAssert(0 == 1, @"required method of dataSource protocol should be implemented");
         return 0;
@@ -432,27 +434,18 @@
     NSInteger leftOrRight = 0;
     if (_rightTableView==tableView) {
         leftOrRight = 1;
-        cell.textLabel.textColor = _leftTextColor;
-        cell.textLabel.font = _rightTextFont;
-        cell.backgroundColor = _rightTableBgColor;
-    }else{
-        cell.textLabel.font = _leftTextFont;
-        cell.backgroundColor = _leftTableBgColor;
-        if (_leftSelectedRow == indexPath.row) { /// 左边选中行
-            cell.backgroundColor = _rightTableBgColor;;
-            cell.textLabel.textColor = _leftSelectTextColor;
-        }
     }
     
     CGSize textSize;
     if ([self.dataSource respondsToSelector:@selector(menu:RowTitleWithModel:)]) {
-        cell.textLabel.text = [self.dataSource menu:self RowTitleWithModel:[KJDropDownMenuModel kIndexPathWithColumn:self.currentSelectedMenudIndex leftOrRight:leftOrRight leftRow:_leftSelectedRow rightRow:indexPath.row]];
+        cell.textLabel.text = [self.dataSource menu:self RowTitleWithModel:[KJDropDownMenuModel kIndexPathWithColumn:self.currentSelectMenuIndex leftOrRight:leftOrRight leftRow:_leftSelectedRow rightRow:indexPath.row]];
         // 只取宽度
         textSize = [cell.textLabel.text textSizeWithFont:_rightTextFont constrainedToSize:CGSizeMake(MAXFLOAT, _rightTextFont.pointSize) lineBreakMode:NSLineBreakByWordWrapping];
     }
+    
     CGFloat iconX = 0;
     if ([self.dataSource respondsToSelector:@selector(menu:RowTextAlignmentForColumn:)]) {
-        KJMenuTextAlignmentType type = [self.dataSource menu:self RowTextAlignmentForColumn:self.currentSelectedMenudIndex];
+        KJMenuTextAlignmentType type = [self.dataSource menu:self RowTextAlignmentForColumn:self.currentSelectMenuIndex];
         switch (type) {
             case KJMenuTextAlignmentTypeLeft:
                 cell.textLabel.textAlignment = NSTextAlignmentLeft;
@@ -467,23 +460,45 @@
         }
     }
     
+    if (_rightTableView==tableView) {
+        cell.textLabel.textColor = _leftTextColor;
+        cell.textLabel.font = _rightTextFont;
+        cell.backgroundColor = _rightTableBgColor;
+    }else{
+        cell.textLabel.font = _leftTextFont;
+        cell.backgroundColor = _leftTableBgColor;
+        if (_leftSelectedRow == indexPath.row) { /// 左边选中行
+            cell.backgroundColor = _rightTableBgColor;;
+            cell.textLabel.textColor = _leftSelectTextColor;
+            if (_kIsDisplayVerticalLine) {
+                UIView *verticalLine = [[UIView alloc]initWithFrame:CGRectMake(0, _TableCellH/4, 2, _TableCellH/2)];
+                verticalLine.backgroundColor = _leftSelectTextColor;
+                [cell addSubview:verticalLine];
+            }
+        }
+    }
+    
     if (leftOrRight == 1) {
         /// 右边tableview
         iconX = textSize.width + 20;
         cell.textLabel.textAlignment = NSTextAlignmentLeft;
-        if ([cell.textLabel.text isEqualToString:[(CATextLayer *)[_titles objectAtIndex:_currentSelectedMenudIndex] string]]) {
-            UIImageView *iconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"KJDropDownMenu.bundle/ico_make"]];
-            iconImageView.frame = CGRectMake(iconX, (self.frame.size.height-12)/2 - 3, 16, 12);
-            [cell addSubview:iconImageView];
+        if ([cell.textLabel.text isEqualToString:[(CATextLayer *)[_titles objectAtIndex:_currentSelectMenuIndex] string]]) {
+            if (_kIsDisplayDraw) {
+                UIImageView *iconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"KJDropDownMenu.bundle/ico_make"]];
+                iconImageView.frame = CGRectMake(iconX, (self.frame.size.height-12)/2 - 3, 16, 12);
+                [cell addSubview:iconImageView];
+            }
         }
     }else{
         if (_leftSelectedRow == indexPath.row) {
             /// 是否显示右边的table
-            BOOL haveRightTableView = [_dataSource menu:self haveRightTableViewInColumn:_currentSelectedMenudIndex];
+            BOOL haveRightTableView = [_dataSource menu:self haveRightTableViewInColumn:_currentSelectMenuIndex];
             if(!haveRightTableView){
-                UIImageView *iconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"KJDropDownMenu.bundle/ico_make"]];
-                iconImageView.frame = CGRectMake(iconX, (self.frame.size.height-12)/2 - 3, 16, 12);
-                [cell addSubview:iconImageView];
+                if (_kIsDisplayDraw) {
+                    UIImageView *iconImageView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"KJDropDownMenu.bundle/ico_make"]];
+                    iconImageView.frame = CGRectMake(iconX, (self.frame.size.height-12)/2 - 3, 16, 12);
+                    [cell addSubview:iconImageView];
+                }
             }
         }
     }
@@ -500,11 +515,11 @@
     }
     
     if (self.delegate || [self.delegate respondsToSelector:@selector(menu:didSelectRowWithModel:)]) {
-        BOOL haveRightTableView = [_dataSource menu:self haveRightTableViewInColumn:_currentSelectedMenudIndex];
+        BOOL haveRightTableView = [_dataSource menu:self haveRightTableViewInColumn:_currentSelectMenuIndex];
         if ((leftOrRight==0 && !haveRightTableView) || leftOrRight==1) {
             [self confiMenuWithSelectRow:indexPath.row leftOrRight:leftOrRight];
         }
-        [self.delegate menu:self didSelectRowWithModel:[KJDropDownMenuModel kIndexPathWithColumn:self.currentSelectedMenudIndex leftOrRight:leftOrRight leftRow:_leftSelectedRow rightRow:indexPath.row]];
+        [self.delegate menu:self didSelectRowWithModel:[KJDropDownMenuModel kIndexPathWithColumn:self.currentSelectMenuIndex leftOrRight:leftOrRight leftRow:_leftSelectedRow rightRow:indexPath.row]];
         if (leftOrRight==0 && haveRightTableView) {
             [_leftTableView reloadData];
             NSIndexPath *selectedIndexPath = [NSIndexPath indexPathForRow:_leftSelectedRow inSection:0];
@@ -515,12 +530,12 @@
 }
 
 - (void)confiMenuWithSelectRow:(NSInteger)row leftOrRight:(NSInteger)leftOrRight{
-    CATextLayer *title = (CATextLayer *)_titles[_currentSelectedMenudIndex];
-    title.string = [self.dataSource menu:self RowTitleWithModel:[KJDropDownMenuModel kIndexPathWithColumn:self.currentSelectedMenudIndex leftOrRight:leftOrRight leftRow:_leftSelectedRow rightRow:row]];
-    [self animateIdicator:_indicators[_currentSelectedMenudIndex]  leftTableView:_leftTableView rightTableView:_rightTableView title:_titles[_currentSelectedMenudIndex] forward:NO complecte:^{
+    CATextLayer *title = (CATextLayer *)_titles[_currentSelectMenuIndex];
+    title.string = [self.dataSource menu:self RowTitleWithModel:[KJDropDownMenuModel kIndexPathWithColumn:self.currentSelectMenuIndex leftOrRight:leftOrRight leftRow:_leftSelectedRow rightRow:row]];
+    [self animateIdicator:_indicators[_currentSelectMenuIndex]  leftTableView:_leftTableView rightTableView:_rightTableView title:_titles[_currentSelectMenuIndex] forward:NO complecte:^{
         self->_show = NO;
     }];
-    CAShapeLayer *indicator = (CAShapeLayer *)_indicators[_currentSelectedMenudIndex];
+    CAShapeLayer *indicator = (CAShapeLayer *)_indicators[_currentSelectMenuIndex];
     indicator.position = CGPointMake(title.position.x + title.frame.size.width / 2 + 8, indicator.position.y);
 }
 

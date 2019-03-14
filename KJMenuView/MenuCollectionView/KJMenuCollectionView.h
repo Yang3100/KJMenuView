@@ -46,11 +46,11 @@
 /// 右边加载更多的距离 默认10
 @property(nonatomic,assign) CGFloat kj_popDistance;
 /// 加载更多的背景色 默认白色
-@property (strong, nonatomic)UIColor *kj_bgColor;
+@property(nonatomic,strong) UIColor *kj_bgColor;
 /// 加载更多字体的背景色 默认黑色
-@property (strong, nonatomic)UIColor *kj_textColor;
+@property(nonatomic,strong) UIColor *kj_textColor;
 /// 加载更多字体的大小  默认12
-@property (assign, nonatomic)CGFloat kj_textSize;
+@property(nonatomic,assign) CGFloat kj_textSize;
 
 
 // 必须设置相关属性，tag除外
